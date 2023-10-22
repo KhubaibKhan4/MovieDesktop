@@ -3,6 +3,8 @@ package ui
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -20,12 +22,16 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Outline
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import component.MovieList
 import data.MovieApiClient
 import data.model.Movie
 import data.model.Result
 import io.ktor.client.plugins.*
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import utils.handCursor
 import java.awt.Cursor
@@ -33,25 +39,13 @@ import java.awt.Cursor
 @Composable
 fun MainScreen() {
 
-    var data by remember {
-        mutableStateOf<Movie?>(null)
-    }
-    var resultData by remember {
-        mutableStateOf(emptyList<Result>())
-    }
-    var isLoading by remember {
-        mutableStateOf(true)
-    }
-    var isVisible by remember {
-        mutableStateOf(false)
-    }
-    var searchText by remember {
-        mutableStateOf("")
-    }
-    var refresh by remember {
-        mutableStateOf(false)
-    }
-
+    var data by remember { mutableStateOf<Movie?>(null) }
+    var resultData by remember { mutableStateOf(emptyList<Result>()) }
+    var isLoading by remember { mutableStateOf(true) }
+    var isVisible by remember { mutableStateOf(false) }
+    var searchText by remember { mutableStateOf("") }
+    var refresh by remember { mutableStateOf(false) }
+    var search by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
 
@@ -63,14 +57,31 @@ fun MainScreen() {
                 resultData = movieData.results
                 isLoading = false
                 println("$movieData")
-
             } catch (e: ClientRequestException) {
                 isLoading = false
                 e.printStackTrace()
             }
         }
-
     }
+
+    if (search) {
+        isLoading = true
+        scope.launch {
+            try {
+                val searchedData = MovieApiClient.getSearched(searchText)
+                data = searchedData
+                resultData = searchedData.results
+                isLoading = false
+                println("$searchedData")
+            } catch (e: ClientRequestException) {
+                isLoading = false
+                e.printStackTrace()
+            } finally {
+                search = false // Reset the search variable after the search operation is completed
+            }
+        }
+    }
+
 
     MaterialTheme {
         Scaffold(modifier = Modifier.fillMaxWidth(),
@@ -108,7 +119,7 @@ fun MainScreen() {
                         }
                         IconButton(
                             onClick = {
-                                      refresh = !refresh
+                                refresh = !refresh
                                 isLoading = true
                             },
                             modifier = Modifier.pointerHoverIcon(icon = handCursor())
@@ -144,9 +155,11 @@ fun MainScreen() {
                             CircularProgressIndicator()
                         }
                     } else {
-                        Column(modifier = Modifier.fillMaxWidth(),
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
                             verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally) {
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
                             AnimatedVisibility(isVisible) {
                                 OutlinedTextField(
                                     value = searchText,
@@ -162,7 +175,16 @@ fun MainScreen() {
                                         Text("Search Movie")
                                     },
                                     trailingIcon = {
-                                        IconButton(onClick = {}) {
+                                        IconButton(
+                                            onClick = {
+                                                scope.launch {
+                                                    search = true
+                                                    isLoading = true
+                                                    data = MovieApiClient.getSearched(searchText)
+                                                }
+                                            },
+                                            modifier = Modifier.pointerHoverIcon(handCursor())
+                                        ) {
                                             Icon(
                                                 imageVector = Icons.Default.Search, contentDescription = null,
                                                 tint = MaterialTheme.colors.primary,
@@ -179,7 +201,20 @@ fun MainScreen() {
                                         focusedBorderColor = MaterialTheme.colors.primary,
                                         trailingIconColor = MaterialTheme.colors.primary,
                                         unfocusedBorderColor = Color.Black,
-                                    )
+                                    ),
+                                    keyboardOptions = KeyboardOptions(
+                                        capitalization = KeyboardCapitalization.Characters,
+                                        autoCorrect = true,
+                                        keyboardType = KeyboardType.Text,
+                                        imeAction = ImeAction.Search
+                                    ),
+                                    keyboardActions = KeyboardActions(onSearch = {
+                                        scope.launch {
+                                            search = true
+                                            isLoading = true
+                                            data = MovieApiClient.getSearched(searchText)
+                                        }
+                                    })
                                 )
                             }
                             data?.results?.let { MovieList(it) }
