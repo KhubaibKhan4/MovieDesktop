@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import component.MovieList
 import data.MovieApiClient
 import data.model.Movie
@@ -166,7 +167,8 @@ fun MainScreen() {
                                     onValueChange = { text ->
                                         searchText = text
                                     },
-                                    modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally),
+                                    modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally).pointerHoverIcon(icon = PointerIcon(
+                                        Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR))),
                                     enabled = isVisible,
                                     label = {
                                         Text(text = "Search Movie")
@@ -218,6 +220,7 @@ fun MainScreen() {
                                 )
                             }
                             data?.results?.let { MovieList(it) }
+
                         }
                     }
                 }

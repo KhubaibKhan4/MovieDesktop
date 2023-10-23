@@ -116,6 +116,7 @@ fun MovieItems(result: Result) {
         }
     }
     if (isVisible) {
+
         AlertDialog(
             onDismissRequest = { isVisible = !isVisible },
             title = { Text("${result.title}") },

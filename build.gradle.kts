@@ -22,14 +22,17 @@ dependencies {
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
 
+    implementation(compose.material3)
+    implementation(compose.materialIconsExtended)
+    implementation(compose.ui)
+
+
     implementation("io.ktor:ktor-client-cio-jvm:2.3.5")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
     implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.5")
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("io.ktor:ktor-server-default-headers:2.3.5")
     implementation("ch.qos.logback:logback-classic:1.2.9")
-   // implementation("androidx.compose.material3:material3:1.1.2")
-
 
 }
 
