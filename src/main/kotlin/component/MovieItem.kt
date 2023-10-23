@@ -16,6 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
@@ -69,7 +70,8 @@ fun MovieItems(result: Result) {
                 modifier = Modifier
                     .weight(1f)
                     .aspectRatio(1f)
-                    .clip(shape = RoundedCornerShape(8.dp))
+                    .clip(shape = RoundedCornerShape(8.dp)),
+                filterQuality = FilterQuality.High
             )
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(2f)) {
@@ -88,9 +90,11 @@ fun MovieItems(result: Result) {
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
-                Row(modifier = Modifier.align(Alignment.End),
+                Row(
+                    modifier = Modifier.align(Alignment.End),
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.Center) {
+                    horizontalArrangement = Arrangement.Center
+                ) {
                     repeat(5) { index ->
                         Icon(
                             imageVector = if (index < result.voteAverage?.toInt()!!) Icons.Default.Star else Icons.Outlined.Star,
