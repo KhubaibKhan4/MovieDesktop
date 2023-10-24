@@ -1,10 +1,16 @@
 package ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.gestures.FlingBehavior
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.rememberScrollableState
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -17,28 +23,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Outline
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import component.MovieList
 import data.MovieApiClient
 import data.model.Movie
 import data.model.Result
 import io.ktor.client.plugins.*
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import utils.handCursor
 import java.awt.Cursor
 
 @Composable
-fun MainScreen() {
+fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
 
     var data by remember { mutableStateOf<Movie?>(null) }
     var resultData by remember { mutableStateOf(emptyList<Result>()) }
@@ -47,6 +53,7 @@ fun MainScreen() {
     var searchText by remember { mutableStateOf("") }
     var refresh by remember { mutableStateOf(false) }
     var search by remember { mutableStateOf(false) }
+
 
     val scope = rememberCoroutineScope()
 
@@ -157,7 +164,7 @@ fun MainScreen() {
                         }
                     } else {
                         Column(
-                            modifier = Modifier.fillMaxWidth(),
+                            modifier = Modifier,
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
@@ -167,8 +174,12 @@ fun MainScreen() {
                                     onValueChange = { text ->
                                         searchText = text
                                     },
-                                    modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally).pointerHoverIcon(icon = PointerIcon(
-                                        Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR))),
+                                    modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally)
+                                        .pointerHoverIcon(
+                                            icon = PointerIcon(
+                                                Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)
+                                            )
+                                        ),
                                     enabled = isVisible,
                                     label = {
                                         Text(text = "Search Movie")
@@ -219,7 +230,11 @@ fun MainScreen() {
                                     })
                                 )
                             }
-                            data?.results?.let { MovieList(it) }
+                            data?.results?.let {results ->
+                                MovieList(results) {result ->
+                                    onItemClick(result)
+                                }
+                            }
 
                         }
                     }

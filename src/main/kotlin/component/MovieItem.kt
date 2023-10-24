@@ -6,7 +6,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -24,38 +28,56 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.rememberWindowState
 import data.model.Result
-import utils.handCursor
 import utils.loadPicture
 import java.awt.Cursor
 
 @Composable
-fun MovieList(result: List<Result>) {
+fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 300.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         items(result) { result ->
-            MovieItems(result)
+            MovieItems(result, onItemClick)
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MovieItems(result: Result) {
+fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
     val uriHandler = LocalUriHandler.current
     var isVisible by remember {
         mutableStateOf(false)
     }
+    val sampleResult = Result(
+        adult = result.adult,
+        backdropPath = result.backdropPath,
+        genreIds = result.genreIds,
+        id = result.id,
+        originalLanguage = result.originalLanguage,
+        originalTitle = result.originalTitle,
+        overview = result.overview,
+        popularity = result.popularity,
+        posterPath = result.posterPath,
+        releaseDate = result.releaseDate,
+        title = result.title,
+        video = result.video,
+        voteAverage = result.voteAverage,
+        voteCount = result.voteCount
+    )
+
     Card(
         modifier = Modifier
             .padding(16.dp)
             .fillMaxWidth()
             .pointerHoverIcon(icon = PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)))
             .clickable {
-                isVisible = !isVisible
+                onItemClick(sampleResult)
+
+
+                // isVisible = !isVisible
             }
     ) {
         Row(

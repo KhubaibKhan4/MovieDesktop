@@ -25,8 +25,8 @@ import kotlin.system.exitProcess
 fun ExitDialog(isOpen: Boolean, onDialogClose: () -> Unit) {
     val dialogState = rememberDialogState(
         position = WindowPosition(alignment = Alignment.Center),
-        width = 400.dp,
-        height = 190.dp
+        width = 430.dp,
+        height = 170.dp
     )
     if (isOpen) {
         Dialog(
