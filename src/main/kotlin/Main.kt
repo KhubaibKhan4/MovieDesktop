@@ -1,5 +1,3 @@
-import androidx.compose.material.Button
-import androidx.compose.material.Text
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -9,6 +7,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.*
+import component.ExitDialog
 import ui.MainScreen
 
 
@@ -20,15 +19,12 @@ fun main() = application {
         size = DpSize(width = 860.dp, height = 720.dp)
     )
 
-    var isOpen  by remember {
-        mutableStateOf(true)
-    }
-    var isClose by remember {
+    var isOpen by remember {
         mutableStateOf(false)
     }
 
     Window(
-        onCloseRequest = ::exitApplication,
+        onCloseRequest = { isOpen = true },
         title = "Movie Desktop",
         icon = painterResource("logo.png"),
         visible = true,
@@ -38,6 +34,7 @@ fun main() = application {
         resizable = true,
         enabled = true,
     ) {
+        ExitDialog(isOpen, onDialogClose = { isOpen = false })
         MainScreen()
     }
 }
