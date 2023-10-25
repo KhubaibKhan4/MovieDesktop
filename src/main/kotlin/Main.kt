@@ -19,7 +19,8 @@ fun main() = application {
         placement = WindowPlacement.Floating,
         isMinimized = true,
         position = WindowPosition(alignment = Alignment.Center),
-        size = DpSize(width = 860.dp, height = 720.dp)
+        size = DpSize(width = 860.dp, height = 720.dp),
+
     )
 
     val sampleResult = Result(
@@ -70,7 +71,7 @@ fun main() = application {
             }
         }
         if (isOpen) {
-            ExitDialog(isOpen, onDialogClose = { isOpen = false })
+            ExitDialog(true, onDialogClose = { isOpen = false })
         }
     }
 }
