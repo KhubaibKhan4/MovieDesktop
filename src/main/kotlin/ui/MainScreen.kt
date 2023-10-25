@@ -101,17 +101,6 @@ fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
                             color = Color.White
                         )
                     },
-                    navigationIcon = {
-                        IconButton(
-                            onClick = {},
-                            modifier = Modifier.pointerHoverIcon(icon = handCursor())
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Menu, contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                    },
                     actions = {
                         IconButton(
                             onClick = {
