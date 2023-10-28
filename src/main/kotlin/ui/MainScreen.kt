@@ -1,33 +1,18 @@
 package ui
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.gestures.FlingBehavior
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.rememberScrollableState
-import androidx.compose.foundation.gestures.scrollable
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.focus.focusTarget
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.text.input.ImeAction
@@ -44,7 +29,13 @@ import utils.handCursor
 import java.awt.Cursor
 
 @Composable
-fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
+fun MainScreen(
+    sampleResult: Result,
+    isRefresh: Boolean,
+    isSearchActive: Boolean,
+    isDarkTheme: Boolean,
+    onItemClick: (Result) -> Unit
+) {
 
     var data by remember { mutableStateOf<Movie?>(null) }
     var resultData by remember { mutableStateOf(emptyList<Result>()) }
@@ -57,7 +48,8 @@ fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
 
     val scope = rememberCoroutineScope()
 
-    LaunchedEffect(refresh) {
+    LaunchedEffect(isRefresh) {
+        isLoading = true
         scope.launch {
             try {
                 val movieData = MovieApiClient.getPopular(1)
@@ -72,7 +64,7 @@ fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
         }
     }
 
-    if (search) {
+    if (isSearchActive) {
         isLoading = true
         scope.launch {
             try {
@@ -92,51 +84,22 @@ fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
 
 
     MaterialTheme {
-        Scaffold(modifier = Modifier.fillMaxWidth(),
-            topBar = {
-                TopAppBar(
-                    title = {
-                        Text(
-                            text = "Movie Compose",
-                            color = Color.White
-                        )
-                    },
-                    actions = {
-                        IconButton(
-                            onClick = {
-                                isVisible = !isVisible
-                            },
-                            modifier = Modifier.pointerHoverIcon(icon = handCursor())
-                        ) {
-                            Icon(
-                                imageVector = if (isVisible) Icons.Default.Close else Icons.Default.Search,
-                                contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                        IconButton(
-                            onClick = {
-                                refresh = !refresh
-                                isLoading = true
-                            },
-                            modifier = Modifier.pointerHoverIcon(icon = handCursor())
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Refresh, contentDescription = null,
-                                tint = Color.White
-                            )
-                        }
-                    }
-                )
-            }
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .background(color = if (isDarkTheme) Color.DarkGray else Color.White)
         ) {
+            if (isLoading) {
 
-            Column(
-                modifier = Modifier.fillMaxWidth()
-                    .padding(top = it.calculateTopPadding())
-            ) {
-                if (isLoading) {
-
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = if (isDarkTheme) Color.White else MaterialTheme.colors.primary
+                    )
+                }
+            } else {
+                if (data == null) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -144,92 +107,84 @@ fun MainScreen(sampleResult: Result, onItemClick: (Result) -> Unit) {
                         CircularProgressIndicator()
                     }
                 } else {
-                    if (data == null) {
-                        Box(
-                            modifier = Modifier.fillMaxSize(),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
+                    Column(
+                        modifier = Modifier,
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        AnimatedVisibility(isSearchActive) {
+                            OutlinedTextField(
+                                value = searchText,
+                                onValueChange = { text ->
+                                    searchText = text
+                                },
+                                modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally)
+                                    .pointerHoverIcon(
+                                        icon = PointerIcon(
+                                            Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)
+                                        )
+                                    ),
+                                enabled = isSearchActive,
+                                label = {
+                                    Text(text = "Search Movie")
+                                },
+                                placeholder = {
+                                    Text("Search Movie")
+                                },
+                                trailingIcon = {
+                                    IconButton(
+                                        onClick = {
+                                            scope.launch {
+                                                search = true
+                                                isLoading = true
+                                                data = MovieApiClient.getSearched(searchText)
+                                            }
+                                        },
+                                        modifier = Modifier.pointerHoverIcon(handCursor())
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Search, contentDescription = null,
+                                            tint = MaterialTheme.colors.primary,
+                                        )
+                                    }
+                                },
+                                singleLine = true,
+                                maxLines = 1,
+                                shape = RoundedCornerShape(24.dp),
+                                colors = TextFieldDefaults.outlinedTextFieldColors(
+                                    textColor = Color.Black,
+                                    backgroundColor = Color.White,
+                                    cursorColor = MaterialTheme.colors.primary,
+                                    focusedBorderColor = MaterialTheme.colors.primary,
+                                    trailingIconColor = MaterialTheme.colors.primary,
+                                    unfocusedBorderColor = Color.Black,
+                                ),
+                                keyboardOptions = KeyboardOptions(
+                                    capitalization = KeyboardCapitalization.Characters,
+                                    autoCorrect = true,
+                                    keyboardType = KeyboardType.Text,
+                                    imeAction = ImeAction.Search
+                                ),
+                                keyboardActions = KeyboardActions(onSearch = {
+                                    scope.launch {
+                                        search = true
+                                        isLoading = true
+                                        data = MovieApiClient.getSearched(searchText)
+                                    }
+                                })
+                            )
                         }
-                    } else {
-                        Column(
-                            modifier = Modifier,
-                            verticalArrangement = Arrangement.Center,
-                            horizontalAlignment = Alignment.CenterHorizontally
-                        ) {
-                            AnimatedVisibility(isVisible) {
-                                OutlinedTextField(
-                                    value = searchText,
-                                    onValueChange = { text ->
-                                        searchText = text
-                                    },
-                                    modifier = Modifier.fillMaxWidth(0.70f).align(Alignment.CenterHorizontally)
-                                        .pointerHoverIcon(
-                                            icon = PointerIcon(
-                                                Cursor.getPredefinedCursor(Cursor.TEXT_CURSOR)
-                                            )
-                                        ),
-                                    enabled = isVisible,
-                                    label = {
-                                        Text(text = "Search Movie")
-                                    },
-                                    placeholder = {
-                                        Text("Search Movie")
-                                    },
-                                    trailingIcon = {
-                                        IconButton(
-                                            onClick = {
-                                                scope.launch {
-                                                    search = true
-                                                    isLoading = true
-                                                    data = MovieApiClient.getSearched(searchText)
-                                                }
-                                            },
-                                            modifier = Modifier.pointerHoverIcon(handCursor())
-                                        ) {
-                                            Icon(
-                                                imageVector = Icons.Default.Search, contentDescription = null,
-                                                tint = MaterialTheme.colors.primary,
-                                            )
-                                        }
-                                    },
-                                    singleLine = true,
-                                    maxLines = 1,
-                                    shape = RoundedCornerShape(24.dp),
-                                    colors = TextFieldDefaults.outlinedTextFieldColors(
-                                        textColor = Color.Black,
-                                        backgroundColor = Color.White,
-                                        cursorColor = MaterialTheme.colors.primary,
-                                        focusedBorderColor = MaterialTheme.colors.primary,
-                                        trailingIconColor = MaterialTheme.colors.primary,
-                                        unfocusedBorderColor = Color.Black,
-                                    ),
-                                    keyboardOptions = KeyboardOptions(
-                                        capitalization = KeyboardCapitalization.Characters,
-                                        autoCorrect = true,
-                                        keyboardType = KeyboardType.Text,
-                                        imeAction = ImeAction.Search
-                                    ),
-                                    keyboardActions = KeyboardActions(onSearch = {
-                                        scope.launch {
-                                            search = true
-                                            isLoading = true
-                                            data = MovieApiClient.getSearched(searchText)
-                                        }
-                                    })
-                                )
+                        data?.results?.let { results ->
+                            MovieList(results) { result ->
+                                onItemClick(result)
                             }
-                            data?.results?.let {results ->
-                                MovieList(results) {result ->
-                                    onItemClick(result)
-                                }
-                            }
+                        }
 
-                        }
                     }
                 }
             }
         }
-
     }
+
 }
+

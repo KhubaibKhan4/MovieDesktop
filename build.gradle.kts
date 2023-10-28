@@ -2,7 +2,8 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("jvm")
-    id("org.jetbrains.compose")
+    //id("org.jetbrains.compose")
+    id("org.jetbrains.compose") version "1.5.0-dev1114"
     kotlin("plugin.serialization") version "1.8.20"
 }
 
@@ -21,11 +22,13 @@ dependencies {
     // (in a separate module for demo project and in testMain).
     // With compose.desktop.common you will also lose @Preview functionality
     implementation(compose.desktop.currentOs)
-
+    implementation(compose.desktop.common)
     implementation(compose.material3)
-    implementation(compose.materialIconsExtended)
     implementation(compose.ui)
-
+    implementation(compose.uiTooling)
+    implementation(compose.preview)
+    implementation(compose.animationGraphics)
+    implementation(compose.materialIconsExtended)
 
     implementation("io.ktor:ktor-client-cio-jvm:2.3.5")
     implementation("io.ktor:ktor-client-content-negotiation:2.3.5")
@@ -33,6 +36,8 @@ dependencies {
     implementation("com.google.code.gson:gson:2.8.9")
     implementation("io.ktor:ktor-server-default-headers:2.3.5")
     implementation("ch.qos.logback:logback-classic:1.2.9")
+    implementation("media.kamel:kamel-image:0.8.2")
+    implementation("net.java.dev.jna:jna:5.9.0")
 
 }
 

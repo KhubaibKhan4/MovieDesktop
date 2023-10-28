@@ -3,17 +3,16 @@ package component
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
-import androidx.compose.foundation.Image
+import androidx.compose.foundation.VerticalScrollbar
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Star
@@ -25,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
 import androidx.compose.ui.layout.ContentScale
@@ -34,18 +32,26 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import data.model.Result
-import utils.loadPicture
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import java.awt.Cursor
 
 @Composable
 fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
-    LazyVerticalGrid(
-        columns = GridCells.Adaptive(minSize = 300.dp),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-    ) {
-        items(result) { result ->
-            MovieItems(result, onItemClick)
+    val state = rememberLazyGridState(0,2)
+    val scrollbarState = rememberScrollbarAdapter(scrollState = state)
+    Box(modifier = Modifier.fillMaxWidth()){
+        LazyVerticalGrid(
+            columns = GridCells.Adaptive(minSize = 300.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            state = state
+        ) {
+            items(result) { result ->
+                MovieItems(result, onItemClick)
+            }
         }
+        VerticalScrollbar(adapter = scrollbarState,
+            modifier = Modifier.align(Alignment.CenterEnd).wrapContentHeight())
     }
 }
 
@@ -94,15 +100,19 @@ fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                Image(
-                    loadPicture("https://image.tmdb.org/t/p/w500${result.posterPath ?: "/zbTaYrQzZaaEf1SZlv3RTZiUvZw.jpg"}"),
+                val imageUrl =
+                    asyncPainterResource(data = "https://image.tmdb.org/t/p/w500${result.posterPath ?: "/zbTaYrQzZaaEf1SZlv3RTZiUvZw.jpg"}")
+                KamelImage(
+                    resource = imageUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
                         .weight(1f)
                         .aspectRatio(1f)
                         .clip(shape = RoundedCornerShape(8.dp)),
-                    filterQuality = FilterQuality.High
+                    onLoading = {
+                        CircularProgressIndicator()
+                    }
                 )
                 Spacer(modifier = Modifier.width(16.dp))
                 Column(modifier = Modifier.weight(2f)) {
