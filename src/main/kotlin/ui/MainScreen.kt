@@ -1,6 +1,7 @@
 package ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -13,8 +14,10 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.input.pointer.PointerIcon
 import androidx.compose.ui.input.pointer.pointerHoverIcon
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -64,7 +67,7 @@ fun MainScreen(
         }
     }
 
-    if (isSearchActive) {
+    if (search) {
         isLoading = true
         scope.launch {
             try {
@@ -89,14 +92,26 @@ fun MainScreen(
                 .background(color = if (isDarkTheme) Color.DarkGray else Color.White)
         ) {
             if (isLoading) {
-
                 Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        color = if (isDarkTheme) Color.White else MaterialTheme.colors.primary
-                    )
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Image(
+                            painter = painterResource("logo.png"),
+                            contentDescription = null,
+                            modifier = Modifier.size(140.dp)
+                                .padding(bottom = 20.dp)
+                        )
+                        LinearProgressIndicator(
+                            modifier = Modifier.width(80.dp),
+                            color = if (isDarkTheme) Color.White else MaterialTheme.colors.primary,
+                            strokeCap = StrokeCap.Round,
+                        )
+                    }
                 }
             } else {
                 if (data == null) {
@@ -179,7 +194,6 @@ fun MainScreen(
                                 onItemClick(result)
                             }
                         }
-
                     }
                 }
             }

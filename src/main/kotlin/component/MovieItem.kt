@@ -10,7 +10,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.rememberScrollbarAdapter
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
@@ -38,9 +37,9 @@ import java.awt.Cursor
 
 @Composable
 fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
-    val state = rememberLazyGridState(0,2)
+    val state = rememberLazyGridState(0, 2)
     val scrollbarState = rememberScrollbarAdapter(scrollState = state)
-    Box(modifier = Modifier.fillMaxWidth()){
+    Box(modifier = Modifier.fillMaxWidth()) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 300.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp),
@@ -50,8 +49,10 @@ fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
                 MovieItems(result, onItemClick)
             }
         }
-        VerticalScrollbar(adapter = scrollbarState,
-            modifier = Modifier.align(Alignment.CenterEnd).wrapContentHeight())
+        VerticalScrollbar(
+            adapter = scrollbarState,
+            modifier = Modifier.align(Alignment.CenterEnd).wrapContentHeight()
+        )
     }
 }
 
@@ -82,8 +83,6 @@ fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
         visible = true,
         enter = fadeIn() + expandHorizontally()
     ) {
-
-
         Card(
             modifier = Modifier
                 .padding(16.dp)
@@ -93,7 +92,7 @@ fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
                 .clickable {
                     onItemClick(sampleResult)
                 },
-            elevation = CardDefaults.cardElevation(8.dp)
+            elevation = CardDefaults.cardElevation(8.dp),
         ) {
             Row(
                 modifier = Modifier

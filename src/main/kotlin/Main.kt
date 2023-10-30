@@ -62,7 +62,6 @@ fun main() = application {
         mutableStateOf(Screen.MAIN)
     }
 
-    var isVisible by remember { mutableStateOf(true) }
     var isActive by remember { mutableStateOf(false) }
     val dialogState = rememberDialogState()
 
@@ -108,20 +107,14 @@ fun main() = application {
         MenuBar {
             Menu(text = "File", mnemonic = 'F') {
                 Item(
-                    "Refresh",
-                    onClick = {
+                    "Refresh", onClick = {
                         isRefresh = !isRefresh
-                    },
-                    shortcut = KeyShortcut(key = Key.R, ctrl = true),
-                    icon = refreshIcon
+                    }, shortcut = KeyShortcut(key = Key.R, ctrl = true), icon = refreshIcon
                 )
                 Item(
-                    "Search",
-                    onClick = {
+                    "Search", onClick = {
                         isSearchActive = !isSearchActive
-                    },
-                    shortcut = KeyShortcut(key = Key.S, ctrl = true),
-                    icon = searchIcon
+                    }, shortcut = KeyShortcut(key = Key.S, ctrl = true), icon = searchIcon
                 )
                 Item(
                     "Exit",
@@ -163,21 +156,15 @@ fun main() = application {
 
             Menu("View", mnemonic = 'V') {
                 Item(
-                    "About",
-                    icon = aboutIcon,
-                    onClick = {
+                    "About", icon = aboutIcon, onClick = {
                         isAbout = !isAbout
-                    },
-                    shortcut = KeyShortcut(key = Key.A, ctrl = true)
+                    }, shortcut = KeyShortcut(key = Key.A, ctrl = true)
                 )
 
                 Item(
-                    "Checks for Updates",
-                    icon = updateIcon,
-                    onClick = {
+                    "Checks for Updates", icon = updateIcon, onClick = {
                         isUpdate = !isUpdate
-                    },
-                    shortcut = KeyShortcut(key = Key.U, ctrl = true)
+                    }, shortcut = KeyShortcut(key = Key.U, ctrl = true)
                 )
 
             }
@@ -214,9 +201,7 @@ fun main() = application {
             focusable = true
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(10.dp),
+                modifier = Modifier.fillMaxSize().padding(10.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -253,9 +238,7 @@ fun main() = application {
             focusable = true
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(20.dp),
+                modifier = Modifier.fillMaxSize().padding(20.dp),
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -281,16 +264,14 @@ fun main() = application {
                     OutlinedButton(
                         onClick = {
                             isUpdate = !isUpdate
-                        },
-                        modifier = Modifier.padding(top = 10.dp)
+                        }, modifier = Modifier.padding(top = 10.dp)
                     ) {
                         Text("Update Now")
                     }
                     OutlinedButton(
                         onClick = {
                             isUpdate = !isUpdate
-                        },
-                        modifier = Modifier.padding(top = 10.dp)
+                        }, modifier = Modifier.padding(top = 10.dp)
                     ) {
                         Text("Remind Me Later")
                     }

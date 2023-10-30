@@ -13,8 +13,4 @@ class Constant {
     }
 }
 
-fun loadPicture(url: String) =
-    Image.makeFromEncoded(URL(url).readBytes())
-        .toComposeImageBitmap()
-
 fun handCursor() = PointerIcon(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
