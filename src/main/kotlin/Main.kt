@@ -95,7 +95,7 @@ fun main() = application {
 
     Window(
         onCloseRequest = { isOpen = true },
-        title = "Movie Desktop",
+        title ="Movie Desktop",
         icon = painterResource("logo.png"),
         visible = true,
         state = state,
