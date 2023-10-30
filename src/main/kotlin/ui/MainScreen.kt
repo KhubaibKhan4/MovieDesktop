@@ -9,6 +9,8 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -50,6 +52,9 @@ fun MainScreen(
 
 
     val scope = rememberCoroutineScope()
+    var page by remember {
+        mutableStateOf(1)
+    }
 
     LaunchedEffect(isRefresh) {
         isLoading = true
@@ -189,9 +194,73 @@ fun MainScreen(
                                 })
                             )
                         }
-                        data?.results?.let { results ->
-                            MovieList(results) { result ->
-                                onItemClick(result)
+                        Box(modifier = Modifier.fillMaxWidth()){
+
+                            data?.results?.let { results ->
+                                MovieList(results) { result ->
+                                    onItemClick(result)
+                                }
+                            }
+
+                            IconButton(
+                                onClick = {
+                                    if (!isLoading) {
+                                        page++
+                                        isLoading = true
+                                        scope.launch {
+                                            try {
+                                                val wallpapers = MovieApiClient.getPopular(page)
+                                                data = wallpapers
+                                                isLoading = false
+                                                println("$data")
+                                            } catch (e: ClientRequestException) {
+                                                e.printStackTrace()
+                                                isLoading = false
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.size(40.dp)
+                                    .background(
+                                        color = if (isDarkTheme) Color.White.copy(alpha = 0.80f) else Color.DarkGray.copy(alpha = 0.80f)
+                                    )
+                                    .align(Alignment.CenterEnd)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowRight,
+                                    contentDescription = null,
+                                    tint = if (isDarkTheme) Color.Black else Color.White
+                                )
+                            }
+                            IconButton(
+                                onClick = {
+                                    if (!isLoading && page > 1) {
+                                        page--
+                                        isLoading = true
+                                        scope.launch {
+                                            try {
+                                                val wallpapers = MovieApiClient.getPopular(page)
+                                                data = wallpapers
+                                                isLoading = false
+                                                println("$data")
+                                            } catch (e: ClientRequestException) {
+                                                e.printStackTrace()
+                                                isLoading = false
+                                            }
+                                        }
+                                    }
+                                },
+                                modifier = Modifier.size(40.dp)
+                                    .background(
+                                        color = if (isDarkTheme) Color.White.copy(alpha = 0.80f) else Color.DarkGray.copy(alpha = 0.80f)
+                                    )
+                                    .align(Alignment.CenterStart)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.KeyboardArrowLeft,
+                                    contentDescription = null,
+                                    tint = if (isDarkTheme) Color.Black else Color.White
+                                )
                             }
                         }
                     }

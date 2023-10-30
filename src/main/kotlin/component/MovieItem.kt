@@ -1,6 +1,9 @@
 package component
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.foundation.VerticalScrollbar
@@ -39,6 +42,16 @@ import java.awt.Cursor
 fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
     val state = rememberLazyGridState(0, 2)
     val scrollbarState = rememberScrollbarAdapter(scrollState = state)
+
+
+    val transition = updateTransition(targetState = state.firstVisibleItemScrollOffset)
+
+    val alpha by transition.animateFloat(
+        transitionSpec = { tween(durationMillis = 300) }
+    ) { offset ->
+        if (offset > 0) 1f else 0f
+    }
+
     Box(modifier = Modifier.fillMaxWidth()) {
         LazyVerticalGrid(
             columns = GridCells.Adaptive(minSize = 300.dp),
@@ -51,7 +64,7 @@ fun MovieList(result: List<Result>, onItemClick: (Result) -> Unit) {
         }
         VerticalScrollbar(
             adapter = scrollbarState,
-            modifier = Modifier.align(Alignment.CenterEnd).wrapContentHeight()
+            modifier = Modifier.align(Alignment.CenterEnd).wrapContentHeight(),
         )
     }
 }
@@ -63,6 +76,8 @@ fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
     var isVisible by remember {
         mutableStateOf(false)
     }
+
+
     val sampleResult = Result(
         adult = result.adult,
         backdropPath = result.backdropPath,
