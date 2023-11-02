@@ -94,6 +94,7 @@ fun MovieItems(result: Result, onItemClick: (Result) -> Unit) {
         voteAverage = result.voteAverage,
         voteCount = result.voteCount
     )
+    
     AnimatedVisibility(
         visible = true,
         enter = fadeIn() + expandHorizontally()
